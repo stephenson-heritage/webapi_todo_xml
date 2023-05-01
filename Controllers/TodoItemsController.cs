@@ -11,6 +11,7 @@ using TodoApi.Models;
 namespace TodoApi.Controllers
 {
     [Route("api/[controller]")]
+    [FormatFilter]
     [ApiController]
     public class TodoItemsController : ControllerBase
     {
@@ -21,25 +22,25 @@ namespace TodoApi.Controllers
             _context = context;
         }
 
-        // GET: api/TodoItems
-        [HttpGet]
+        // GET: api/TodoItems/x? (x is alpha and optional)
+        [HttpGet("{format:alpha?}")]
         public async Task<ActionResult<IEnumerable<TodoItem>>> GetTodoItems()
         {
-          if (_context.TodoItems == null)
-          {
-              return NotFound();
-          }
+            if (_context.TodoItems == null)
+            {
+                return NotFound();
+            }
             return await _context.TodoItems.ToListAsync();
         }
 
-        // GET: api/TodoItems/5
-        [HttpGet("{id}")]
+        // GET: api/TodoItems/x (x >= 1)
+        [HttpGet("{id:min(1)}/{format:alpha?}")]
         public async Task<ActionResult<TodoItem>> GetTodoItem(uint id)
         {
-          if (_context.TodoItems == null)
-          {
-              return NotFound();
-          }
+            if (_context.TodoItems == null)
+            {
+                return NotFound();
+            }
             var todoItem = await _context.TodoItems.FindAsync(id);
 
             if (todoItem == null)
@@ -86,10 +87,10 @@ namespace TodoApi.Controllers
         [HttpPost]
         public async Task<ActionResult<TodoItem>> PostTodoItem(TodoItem todoItem)
         {
-          if (_context.TodoItems == null)
-          {
-              return Problem("Entity set 'TodoContext.TodoItems'  is null.");
-          }
+            if (_context.TodoItems == null)
+            {
+                return Problem("Entity set 'TodoContext.TodoItems'  is null.");
+            }
             _context.TodoItems.Add(todoItem);
             await _context.SaveChangesAsync();
 

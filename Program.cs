@@ -9,7 +9,9 @@ builder.Services.AddControllers().AddXmlSerializerFormatters();
 // add ability to output xml
 
 
-builder.Services.AddDbContext<TodoContext>(opt => opt.UseInMemoryDatabase("todo"));
+//builder.Services.AddDbContext<TodoContext>(opt => opt.UseInMemoryDatabase("todo"));
+
+builder.Services.AddDbContextFactory<TodoContext>(options => options.UseSqlite(builder.Configuration.GetConnectionString("TodoConnection")));
 
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -24,10 +26,15 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+
 app.UseHttpsRedirection();
+
+app.UseDefaultFiles();
+app.UseStaticFiles();
 
 app.UseAuthorization();
 
-app.MapControllers();
 
+
+app.MapControllers();
 app.Run();
