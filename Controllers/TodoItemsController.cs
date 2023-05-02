@@ -16,10 +16,12 @@ namespace TodoApi.Controllers
     public class TodoItemsController : ControllerBase
     {
         private readonly TodoContext _context;
+        private readonly ILogger<TodoItemsController> _logger;
 
-        public TodoItemsController(TodoContext context)
+        public TodoItemsController(TodoContext context, ILogger<TodoItemsController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         // GET: api/TodoItems/x? (x is alpha and optional)
@@ -49,6 +51,28 @@ namespace TodoApi.Controllers
             }
 
             return todoItem;
+        }
+
+
+        [HttpPatch("{id:int}/{complete:bool}")]
+        public async Task<ActionResult<TodoItem>> PatchTodoItem(uint id, bool complete)
+        {
+            var todoObj = await _context.TodoItems.FindAsync(id); // find the record with the given id
+
+            if (todoObj == null) // if does not exist, 404
+            {
+                return NotFound();
+            }
+            if (todoObj.IsComplete == complete) // if the record is already set to value of complete, don't do anything
+            {
+                return NoContent();
+            }
+            todoObj.IsComplete = complete; // set the value
+            _context.Update(todoObj); // update context
+            await _context.SaveChangesAsync(); // save to db
+
+            return todoObj;
+
         }
 
         // PUT: api/TodoItems/5

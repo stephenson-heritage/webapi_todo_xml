@@ -8,6 +8,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers().AddXmlSerializerFormatters();
 // add ability to output xml
 
+builder.Services.AddCors(opt =>
+{
+    opt.AddPolicy("AllowAll",
+    builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+});
+
 
 //builder.Services.AddDbContext<TodoContext>(opt => opt.UseInMemoryDatabase("todo"));
 
@@ -26,7 +32,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-
+app.UseCors("AllowAll");
 app.UseHttpsRedirection();
 
 app.UseDefaultFiles();
